@@ -5,6 +5,14 @@
 #include <errno.h>	/* Error number definitions */
 #include <termios.h>	/* POSIX terminal control definitions */
 
+/* Lots of credit to Michael R. Sweet for his writeup. 
+ * A lot of this is directly or slightly indirectly his code, adapted for my uses.
+ * http://www.cmrr.umn.edu/~strupp/serial.html#2_1
+ * 
+ * Derek Snyder
+ * Fri 27 Apr 20:53:06 EDT 2018
+ */
+
 #define _PORT 	"/dev/ttyAMA0"
 /* Common baud rates
  * 	  B9600
@@ -12,6 +20,20 @@
  *	B115200
  */
 #define _BAUDRT B9600
+
+/* Common char size and parity bit setups
+ * 8N1 	No parity
+ * 7E1  Even parity
+ * 7O1  Odd parity
+ * 7S1  Space parity/ no parity
+ */
+#define _8N1	0
+#define _7E1	1
+#define _7O1	2
+#define _7S1	3
+
+#define _PARITY _8N1
+
 
 /* Returns
  * 	(int) file descriptor of port
@@ -23,19 +45,76 @@ open_port(void)
 
 	fd = open(_PORT, O_RDWR | O_NOCTTY | O_NDELAY);
 	/* O_RDWR	read/write mode
-	 * O_NOCTTY	tells UNIX that this program doesn't want to be the 'controlling terminal' for this port. Otherwise, keyboard abort signals (&c.) could affect process.
-	 * O_NDELAY 	tells UNIX that the program doesn't care what state DCD ('Data Carrier Detect') line is in <--> in other words, what state the other end of the port is in
+	 * O_NOCTTY	tells UNIX that this program doesn't want to be the 
+	 * 		'controlling terminal' for this port. Otherwise, 
+	 * 		keyboard abort signals (&c.) could affect process.
+	 * O_NDELAY 	tells UNIX that the program doesn't care what state 
+	 * 		DCD ('Data Carrier Detect') line is in 
+	 * 		<--> in other words, what state the other end of 
+	 * 		the port is in
 	 */
 	if (fd == -1)
 	{
 		// Couldn't open port
-		perror("open_port: Unable to open /dev/ttyAMA0 - ");
+		perror("open_port: Unable to open _PORT - ");
 	}
 	else {
 		/* set third argument to 0 for blocking read() calls,
-		 * or set to "FNDELAY" for nonblocking
-		 */
+		 * or set to "FNDELAY" for nonblocking */
 		fcntl(fd, F_SETFL, FNDELAY);
+		
+		struct termios options;
+		/* Get current port configuration */
+		tcgetattr(fd, &options);
+
+		/* Set baud rate to definition (I and O respectively) */
+		cfsetispeed(&options, _BAUDRT);
+		cfsetospeed(&options, _BAUDRT);		
+
+		/* Set control options with c_cflag member.
+		 * These should be set as so pretty much always...
+		 * 	CLOCAL	local line; don't change port owner
+		 * 	CREAD	enable receiver
+		 */
+		options.c_cflag |= (CLOCAL | CREAD);
+
+		/* Mask character size bits; gotta do this before setting */
+		options.c_cflag &= ~CSIZE;
+		/* Now set parity based on #def */
+		if (_PARITY == _8N1)
+		{
+			options.c_cflag &= ~PARENB;
+			options.c_cflag &= ~CSTOPB;
+			options.c_cflag |= CS8;
+		}
+		else if (_PARITY == _7E1)
+		{
+			options.c_cflag |= PARENB;
+			options.c_cflag &= ~PARODD;
+			options.c_cflag &= ~CSTOPB;
+			options.c_cflag |= CS7;
+		} 
+		else if (_PARITY == _7O1)
+		{
+			options.c_cflag |= PARENB;
+			options.c_cflag |= PARODD;
+			options.c_cflag &= ~CSTOPB;
+			options.c_cflag |= CS7;
+		} 
+		else if (_PARITY == _7S1)
+		{
+			options.c_cflag &= ~PARENB;	
+			options.c_cflag &= ~CSTOPB;
+			options.c_cflag |= CS8;
+		}
+
+		/* Now set new options. 
+		 * TCSANOW 	means do it now, instead of waiting for input
+		 * 		output operations to finish 
+		 * TCSADRAIN 	wait until IO operations finish
+		 * TCSAFLUSH 	flush IO buffers and make changes 
+		 */
+		tcsetattr(fd, TCSANOW, &options);
 	}
 
 	return (fd);
