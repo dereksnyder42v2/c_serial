@@ -14,6 +14,7 @@
  */
 
 #define PORT 	"/dev/ttyAMA0"
+
 /* Common baud rates
  * 	  B9600
  * 	 B19200
@@ -58,7 +59,8 @@ open_port(void)
 		// Couldn't open port
 		perror("open_port: Unable to open PORT - ");
 	}
-	else {
+	else 
+	{
 		/* set third argument to 0 for blocking read() calls,
 		 * or set to "FNDELAY" for nonblocking */
 		fcntl(fd, F_SETFL, FNDELAY);
@@ -131,7 +133,8 @@ int
 write_port(int fd, const void *buf, size_t count)
 {
 	int n = write(fd, buf, count);
-	if (n < 0) {
+	if (n < 0) 
+	{
 		fputs("write_port: Write to port failed!\n", stderr);
 	}
 
