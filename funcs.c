@@ -110,6 +110,29 @@ open_port(void)
 			options.c_cflag |= CS8;
 		}
 
+		/* Types of input setup
+		 * Canonical	input is line-oriented; characters are put in a buffer and only sent when
+		 * 				CR or NL is received
+		 * Raw			input is unprocessed. Whatever goes in, goes out.
+		 */
+		//options.c_lflag |= (ICANON | ECHO | ECHOE); 		// canonical
+		options.c_lflag &= !(ICANON | ECHO | ECHOE | ISIG);	// raw
+
+		// TODO
+		/* Input parity checking
+		 *
+		 */
+
+		// TODO
+		/* Software flow control
+		 *
+		 */
+
+		// TODO
+		/* Output options
+		 * 
+		 */
+
 		/* Now set new options. 
 		 * TCSANOW 	means do it now, instead of waiting for input
 		 * 		output operations to finish 
