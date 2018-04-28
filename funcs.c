@@ -13,7 +13,10 @@
  * Fri 27 Apr 20:53:06 EDT 2018
  */
 
-//#define PORT 	"/dev/ttyAMA0"
+/* ttyAMA0 should be the port for the onboard 
+ * but maybe not.
+ */
+//#define PORT 	"/dev/ttyAMA0"	
 #define PORT	"/dev/ttyUSB0"
 
 /* Common baud rates
