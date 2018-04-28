@@ -13,13 +13,13 @@
  * Fri 27 Apr 20:53:06 EDT 2018
  */
 
-#define _PORT 	"/dev/ttyAMA0"
+#define PORT 	"/dev/ttyAMA0"
 /* Common baud rates
  * 	  B9600
  * 	 B19200
  *	B115200
  */
-#define _BAUDRT B9600
+#define BAUDRT 	B9600
 
 /* Common char size and parity bit setups
  * 8N1 	No parity
@@ -32,7 +32,7 @@
 #define _7O1	2
 #define _7S1	3
 
-#define _PARITY _8N1
+#define PARITY 	_8N1
 
 
 /* Returns
@@ -43,7 +43,7 @@ open_port(void)
 {
 	int fd; // File descriptor for port
 
-	fd = open(_PORT, O_RDWR | O_NOCTTY | O_NDELAY);
+	fd = open(PORT, O_RDWR | O_NOCTTY | O_NDELAY);
 	/* O_RDWR	read/write mode
 	 * O_NOCTTY	tells UNIX that this program doesn't want to be the 
 	 * 		'controlling terminal' for this port. Otherwise, 
@@ -56,7 +56,7 @@ open_port(void)
 	if (fd == -1)
 	{
 		// Couldn't open port
-		perror("open_port: Unable to open _PORT - ");
+		perror("open_port: Unable to open PORT - ");
 	}
 	else {
 		/* set third argument to 0 for blocking read() calls,
@@ -68,8 +68,8 @@ open_port(void)
 		tcgetattr(fd, &options);
 
 		/* Set baud rate to definition (I and O respectively) */
-		cfsetispeed(&options, _BAUDRT);
-		cfsetospeed(&options, _BAUDRT);		
+		cfsetispeed(&options, BAUDRT);
+		cfsetospeed(&options, BAUDRT);		
 
 		/* Set control options with c_cflag member.
 		 * These should be set as so pretty much always...
@@ -81,27 +81,27 @@ open_port(void)
 		/* Mask character size bits; gotta do this before setting */
 		options.c_cflag &= ~CSIZE;
 		/* Now set parity based on #def */
-		if (_PARITY == _8N1)
+		if (PARITY == _8N1)
 		{
 			options.c_cflag &= ~PARENB;
 			options.c_cflag &= ~CSTOPB;
 			options.c_cflag |= CS8;
 		}
-		else if (_PARITY == _7E1)
+		else if (PARITY == _7E1)
 		{
 			options.c_cflag |= PARENB;
 			options.c_cflag &= ~PARODD;
 			options.c_cflag &= ~CSTOPB;
 			options.c_cflag |= CS7;
 		} 
-		else if (_PARITY == _7O1)
+		else if (PARITY == _7O1)
 		{
 			options.c_cflag |= PARENB;
 			options.c_cflag |= PARODD;
 			options.c_cflag &= ~CSTOPB;
 			options.c_cflag |= CS7;
 		} 
-		else if (_PARITY == _7S1)
+		else if (PARITY == _7S1)
 		{
 			options.c_cflag &= ~PARENB;	
 			options.c_cflag &= ~CSTOPB;
