@@ -162,7 +162,11 @@ write_port(int fd, const void *buf, size_t count)
 	int n = write(fd, buf, count);
 	if (n < 0) 
 	{
-		perror("write_port: Write to port failed -");
+		;
+		/* TODO find a better way to handle write_port errors.
+		 * getting a lot of "resource busy" errors etc.
+		 */
+		//perror("write_port: Write to port failed -");
 	}
 
 	return (n);
