@@ -32,17 +32,12 @@ main(void)
 	/* descriptor of file we want to send */
 	int sendfile_fd = open(FILENAME, O_RDONLY);
 
-	/*
-	printf("Writing test string 'hello' to port\n");
-	int write_success = write_port(port_fd, "hello", 5);
-	printf("write_port() returned %d\n", write_success);
-	*/
-	
 	/* Now, to business.
 	 * Write file described by "sendfile_fd", 100 Bytes at a time.
 	 * On each pass, print # Bytes succesfully written/ returned from "read()" call
 	 */	
 	char* buf[100];
+	volatile char* err_buff;
 	//char* buf_err[100];
 	int bytes_read = 0;
 	int bytes_written = 100;
@@ -55,13 +50,13 @@ main(void)
 		{
 			printf("\tSomething went wrong...read %d, wrote %d\n", bytes_read, bytes_written);
 			if ( bytes_written == -1 ) /* error occurred */
-			{
+			{ //retry
 				bytes_written = write_port(port_fd, &buf, bytes_read);
 			}
 			else
-			{
-
-				//bytes_written += write_port(port_fd, 
+			{ //create buffer for whatever is left and retry
+				err_buff = slice_buffer(buf, bytes_written-1, bytes_read-1);
+				bytes_written += write_port(port_fd, err_buff, bytes_read - bytes_written);
 			}
 		}
 		offset += bytes_read;
