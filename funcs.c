@@ -150,8 +150,8 @@ open_port(void)
 }
 
 /* Params
- *  	(int)	fd	 file descriptor of port
- *  	(ptr) 	buf	pointer to what to write
+ *  	(int)	fd	 	file descriptor of port
+ *  	(ptr) 	buf		pointer to what to write
  *  	(size_t)count	max number of bytes to write
  * Returns
  * 	(int) number of bytes written, or -1 if error occurred 

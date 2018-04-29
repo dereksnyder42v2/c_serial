@@ -12,7 +12,7 @@ int write_port(int fd, const void *buf, size_t count);
 int close_port(int fd);
 
 /* Other Prototypes */
-void slice_buffer(const void *input_buf, int offset, void *output_buf);
+char* slice_buffer(char *input_buf, int start_pos, int end_pos);
 
 /* TODO change main to write whatever file is passed from cmd line
  * TODO add retry when # bytes written < 100
@@ -60,11 +60,12 @@ main(void)
 			}
 			else
 			{
+
 				//bytes_written += write_port(port_fd, 
 			}
 		}
 		offset += bytes_read;
-		printf("\tread %d B, wrote %d B\n", num_bytes_read, num_bytes_written);
+		printf("\tread %d B, wrote %d B\n", bytes_read, bytes_written);
 	}
 	
 // 	for (int head = 0; head < FILESIZE; head += num_bytes_read)

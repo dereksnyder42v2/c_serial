@@ -12,7 +12,7 @@
  * 		pointer to first char of sliced array
  */
 char*
-slice(char* input_buf, const int start_pos, const int end_pos) {
+slice_buffer(char* input_buf, const int start_pos, const int end_pos) {
 
 	char *sliced_buf;
 	volatile char *buf_ptr; // pointer 	
@@ -33,7 +33,7 @@ slice(char* input_buf, const int start_pos, const int end_pos) {
 	
 	return sliced_buf;
 }
-
+/*
 int
 main(void)
 {
@@ -48,3 +48,4 @@ main(void)
 
 	return 0;
 }
+*/
