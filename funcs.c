@@ -162,7 +162,7 @@ write_port(int fd, const void *buf, size_t count)
 	int n = write(fd, buf, count);
 	if (n < 0) 
 	{
-		fputs("write_port: Write to port failed!\n", stderr);
+		perror("write_port: Write to port failed -");
 	}
 
 	return (n);
