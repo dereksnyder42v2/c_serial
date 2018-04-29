@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -12,7 +13,7 @@ int write_port(int fd, const void *buf, size_t count);
 int close_port(int fd);
 
 /* Other Prototypes */
-char* slice_buffer(char *input_buf, int start_pos, int end_pos);
+//char* slice_buffer(char *input_buf, int start_pos, int end_pos);
 
 /* TODO change main to write whatever file is passed from cmd line
  * TODO add retry when # bytes written < 100
@@ -37,10 +38,12 @@ main(void)
 	 * On each pass, print # Bytes succesfully written/ returned from "read()" call
 	 */	
 	char* buf[100];
-	volatile char* err_buff;
+	volatile char* err_buf_base;
+	volatile char* err_buf_ptr;
 	//char* buf_err[100];
 	int bytes_read = 0;
 	int bytes_written = 100;
+	int tmp_bytes_written;
 	int offset = 0;
 	while ( offset < FILESIZE )
 	{
@@ -48,38 +51,34 @@ main(void)
 		bytes_written = write_port(port_fd, &buf, bytes_read);
 		while ( bytes_written != bytes_read )
 		{
-			printf("\tSomething went wrong...read %d, wrote %d\n", bytes_read, bytes_written);
-			if ( bytes_written == -1 ) /* error occurred */
-			{ //retry
-				bytes_written = write_port(port_fd, &buf, bytes_read);
+			if ( bytes_written == -1 )
+			{
+				bytes_written = 0;
 			}
 			else
-			{ //create buffer for whatever is left and retry
-				err_buff = slice_buffer(buf, bytes_written-1, bytes_read-1);
-				bytes_written += write_port(port_fd, err_buff, bytes_read - bytes_written);
-			}
+			{
+				/* ohshit 
+				 * allocate new array, and try to write that. however much is written, add 
+				 * that to bytes_written */
+				err_buf_base = (char*)malloc(bytes_read - bytes_written);
+				err_buf_ptr = err_buf_base;
+				for (int i = 0; i < (bytes_read - bytes_written); i++)
+				{
+					*err_buf_ptr = (char)*(&buf + i + bytes_written);					
+					err_buf_ptr += sizeof(char);
+				}
+				tmp_bytes_written = write_port(port_fd, &err_buf_base, bytes_read - bytes_written);
+				tmp_bytes_written = (tmp_bytes_written >= 0)? tmp_bytes_written : 0 ;
+				bytes_written += tmp_bytes_written;
+
+				//free(err_buf_base);
+				//free(err_buf_ptr);
+			}			
 		}
 		offset += bytes_read;
 		printf("\tread %d B, wrote %d B\n", bytes_read, bytes_written);
 	}
 	
-// 	for (int head = 0; head < FILESIZE; head += num_bytes_read)
-// 	{
-// 		//if ( head % 4800 == 0 ) sleep(1);
-// 		
-// 		num_bytes_read = read(sendfile_fd, &buf, 100); /* read up to 100 B */
-// 		num_bytes_wrote = write_port(port_fd, &buf, num_bytes_read);
-// 		if ( num_bytes_wrote < 0 )
-// 		{
-// 			printf("write_port failed in neighborhood of head+num_bytes_read=%d\n",
-// 					(head + num_bytes_read));
-// 			//break;
-// 		}
-// 		printf("\tread %d B, wrote %d B\n", num_bytes_read, num_bytes_wrote);	
-// 	}
-
-		
-
 	/* Done with stuff */
 	fclose(sendfile_fp);
 	close(sendfile_fd);
@@ -88,12 +87,4 @@ main(void)
 	return 0;
 }
 
-void* 
-whats_left(	const void *input_buf, 
-		int offset)
-{
-	for (int i = offset; i < sizeof(input_buf); i++)
-	{
-		
-	}	
-}
+
