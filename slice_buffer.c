@@ -1,35 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int
-main(void) {
+/* Params
+ *		const char* input_buf
+ * 			buffer we want to read from
+ * 		const int 	start_pos
+ *			index in input_buf to start reading at
+ *		const int 	end_pos
+ * 			index in input_buf to stop reading at
+ *  Returns
+ * 		pointer to first char of sliced array
+ */
+char*
+slice(char* input_buf, const int start_pos, const int end_pos) {
 
-	int buf[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-	for (int i = 0; i < 10; i++)
+	char *sliced_buf;
+	volatile char *buf_ptr; // pointer 	
+
+	sliced_buf = (char *)malloc(end_pos - start_pos + 1);
+
+	if (sliced_buf == NULL) printf("woops\n");
+
+	for (int i = 0; i <= (end_pos - start_pos); i++)
 	{
-		printf("%d,", buf[i]);
+		buf_ptr = sliced_buf + i*sizeof(char);
+		*buf_ptr = (char)(input_buf + start_pos*sizeof(char) + i*sizeof(char));
+		/*
+		printf("buf_ptr = %p, value at = %d\n", buf_ptr, (int)*buf_ptr);
+		printf("index = %d, buf[index] = %d\n", i + start_pos, (int)input_buf[i + start_pos]);
+		*/
 	}
-	printf("\n");
-
-	int *sliced_buf;
-	const int start = 5; 	//index of slice beginning
-	const int end = 9;		//index of slice end
-	//char *start_address = sliced_buf + start*sizeof(char);
 	
-	sliced_buf = (int *)calloc(end - start + 1, sizeof(int));
-	volatile int *buf_ptr; // pointer 
-	for (int i = 0; i <= (end - start); i++)
-	{
-		buf_ptr = sliced_buf + i*sizeof(int);
-		*buf_ptr = buf[i + start];
-		printf("buf_ptr=%p, value at=%d\n", buf_ptr, *buf_ptr);
-		printf("index=%d, buf[index]=%d, ", i + start, buf[i + start]);
-		//printf("*val=%c\n", *val);
-		printf("\n");
-	}
-	printf("\n");
+	return sliced_buf;
+}
 
-	free (sliced_buf);
+int
+main(void)
+{
+	char* in_buf = {0, 1, 2, 3, 4};
+
+	char* out_buf = slice(in_buf, 2, 4);
+	//return 0;
+	for (int i = 0; i < 3; i++)
+	{
+		printf("%d %d\n", i, (int)*(out_buf + i));
+	}
 
 	return 0;
 }
