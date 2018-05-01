@@ -151,6 +151,21 @@ open_port(void)
 }
 
 /* Params
+ * 	(int)	fd	file descriptor of port
+ * 		*buf	buffer base pointer to write to 
+ * 	size_t	count	max number of Bytes to write into buffer
+ * Returns
+ * 	(int)		number of Bytes read from port
+ */
+int 
+read_port(int fd, const void *buf, size_t count)
+{
+	int n = read(fd, buf, count);
+
+	return 0;
+}
+
+/* Params
  *  	(int)	fd	 	file descriptor of port
  *  	(ptr) 	buf		pointer to what to write
  *  	(size_t)count	max number of bytes to write
