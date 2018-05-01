@@ -17,7 +17,7 @@
  * but maybe not.
  */
 //#define PORT 	"/dev/ttyAMA0"	
-#define PORT	"/dev/ttyUSB0"
+//#define PORT	"/dev/ttyUSB0"
 
 /* Common baud rates
  * 	  B9600
@@ -40,16 +40,18 @@
 #define PARITY 	_8N1
 
 
-/* Returns
+/* Params
+ * 	(str) name of serial port, in /dev/
+ * Returns
  * 	(int) file descriptor of port
  */
 int
-open_port(void)
+open_port(void* buf)
 {
 	int fd; // File descriptor for port
 
 	//fd = open(PORT, O_RDWR | O_NOCTTY | O_NDELAY);
-	fd = open(PORT, O_RDWR | O_NOCTTY );
+	fd = open(buf, O_RDWR | O_NOCTTY );
 	/* O_RDWR	read/write mode
 	 * O_NOCTTY	tells UNIX that this program doesn't want to be the 
 	 * 		'controlling terminal' for this port. Otherwise, 
@@ -144,7 +146,7 @@ open_port(void)
 		 * TCSADRAIN 	wait until IO operations finish
 		 * TCSAFLUSH 	flush IO buffers and make changes 
 		 */
-		tcsetattr(fd, TCSANOW, &options);
+		tcsetattr(fd, TCSAFLUSH, &options);
 	}
 
 	return (fd);
@@ -162,7 +164,7 @@ read_port(int fd, const void *buf, size_t count)
 {
 	int n = read(fd, buf, count);
 
-	return 0;
+	return n;
 }
 
 /* Params
