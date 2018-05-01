@@ -86,10 +86,10 @@ int main(int argc, char* argv[])
 		pac.seq = file_offset / 40; 
 		bytes_read = pread(sendfile_fd, &pac.data, 40, file_offset);
 		ck = 0;
-		printf("Calculating checksum... ");
+		//printf("Calculating checksum... ");
 		for (int i = 0; i < bytes_read; i++) ck += (short)*(&pac.data + i);
 		pac.checksum = ck;
-		printf("done (%d).\n", (int)ck);
+		//printf("done (%d).\n", (int)ck);
 		pac.len = bytes_read;
 
 		/* the while block below continues to send the same Byte until "write_port()"
@@ -97,14 +97,15 @@ int main(int argc, char* argv[])
 		 * while 0 indicates no Bytes were written.
 		 * TODO figure out why so many "resource busy" errors
 		 */
-		printf("Sending packet...\n");
+		//printf("Sending packet...\n");
 		for (int i = 0; i < 55; i++)
 		{
 			bytes_written_temp = 0;
 			while ( bytes_written_temp != 1 )
 				bytes_written_temp = write_port(port_fd, ((char*)&pac + i), 1);
 		}
-		printf("Packet sent. File offset %d B\n", file_offset);		
+		print_packet(pac);
+		//printf("Packet sent. File offset %d B\n", file_offset);		
 		file_offset += bytes_read;
 	}
 	
@@ -112,7 +113,7 @@ int main(int argc, char* argv[])
 	fclose(sendfile_fp);
 	close(sendfile_fd);
 	int close_success = close_port(port_fd);
-	printf("close_port() returned %d\n", close_success);
+	if (close_success != 0) printf("close_port() returned %d\n", close_success);
 
 	return 0;
 }

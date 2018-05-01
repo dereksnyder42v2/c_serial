@@ -86,7 +86,8 @@ int main(int argc, char* argv[])
 				printf("%c", (char)*pac_ptr);
 				pac_ptr += sizeof(char);	
 			}
-			break;
+			bytes_read = 0;
+			print_packet(pac);
 		}
 	}
 	print_packet(pac);
