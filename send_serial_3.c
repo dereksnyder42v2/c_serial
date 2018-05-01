@@ -7,30 +7,41 @@
 /* This is version 3--incorporates sequence numbers and checksums into packets for Forward Error Correction */
 
 /* func.c Prototypes */
-int open_port(void* buf);
+int open_port(void* port_name);
 int write_port(int fd, const void *buf, size_t count);
 int close_port(int fd);
 
 /* Other Prototypes */
-
 /* TCP style. Total length is  */
 struct Packet 
 { 
 	short	src;		/* 2  source identifier */
 	short	dst;		/* 2  destination identifier */
-	int	seq;		/* 4  sequence number */
-	int	ack;		/* 4  acknowledgement number */
+	int		seq;		/* 4  sequence number */
+	int		ack;		/* 4  acknowledgement number */
 	short	checksum;	// 2
 	char	len;		// 1
 	char	data[40];	// 40
-				/* 55 Byte packets */
+						/* 55 Byte packets */
 };
 
-/* TODO
- * currently, this code attempts to open the /dev/ttyUSB0 device; funcs.c 
- * must be manually changed to use a different device. it would be useful to
- * specify the port &/or transmission Baud rate as command line args.
- */
+void print_packet(struct Packet pac)
+{
+	printf("\nsrc\n\t%d\n", (int)pac.src);
+	printf("dst\n\t%d\n", (int)pac.dst);
+	printf("seq\n\t%d\n", pac.seq);
+	printf("ack\n\t%d\n", pac.ack);
+	printf("checksum\n\t%d\n", pac.checksum);
+	printf("len\n\t%d\n", pac.len);
+	for (int j = 0; j < 40; j++)
+	{
+		if (j % 8 == 0) printf("\n"); 
+		printf("%02x ", (char)pac.data[j]);
+	}
+	printf("\n");
+	return;
+}
+
 
 /* Compiling
  * 	gcc funcs.c serial_serial_3.c -o Send
@@ -39,6 +50,7 @@ struct Packet
 int main(int argc, char* argv[])
 {
 	int port_fd = open_port(argv[2]);
+	if (port_fd <= 0) printf("open_port() returned %d\n", port_fd);
 	/* Do stuff */
 
 	/* pointer to file we want to send over port */
@@ -104,4 +116,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-

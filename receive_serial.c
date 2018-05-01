@@ -11,18 +11,16 @@ int read_port(int fd, const void *buf, size_t count);
 int close_port(int fd);
 
 /* Other Prototypes */
-
-/* TCP style. Total length is  */
 struct Packet 
 { 
 	short	src;		/* 2  source identifier */
 	short	dst;		/* 2  destination identifier */
-	int	seq;		/* 4  sequence number */
-	int	ack;		/* 4  acknowledgement number */
+	int		seq;		/* 4  sequence number */
+	int		ack;		/* 4  acknowledgement number */
 	short	checksum;	// 2
 	char	len;		// 1
 	char	data[40];	// 40
-				/* 55 Byte packets */
+						/* 55 Byte packets */
 };
 
 void print_packet(struct Packet pac)
@@ -39,11 +37,10 @@ void print_packet(struct Packet pac)
 		printf("%02x ", (char)pac.data[j]);
 	}
 	printf("\n");
+	
 	return;
 }
 
-
-/* TODO specify the transmission Baud rate as command line arg */
 int main(int argc, char* argv[])
 {
 	int port_fd = open_port(argv[2]);
@@ -61,7 +58,6 @@ int main(int argc, char* argv[])
 	int file_offset = 0; 	/* 'how far in' to the file we are sending */
 	
 	struct Packet pac;
-	//char* pac_p = (char *)&pac;
 	/* Not using these fields for now...*/
 	pac.src = 	(short)0;
 	pac.dst = 	(short)0;
@@ -94,14 +90,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	print_packet(pac);
-	/* as chars 
-	for (int i = 0; i < 55; i++) 
-		printf("%c", (char)buf[i]);
-	// as ints
-	for (int i = 0; i < 55; i++) 
-		printf("%d", (int)buf[i]);
-	*/
-		
+			
 	/* Done with stuff */
 	close(rcvfile_fd);
 	int close_success = close_port(port_fd);
@@ -109,4 +98,5 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+
 
