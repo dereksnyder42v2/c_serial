@@ -59,34 +59,35 @@ int main(int argc, char* argv[])
 	/* Not using these fields for now...*/
 	pac.src = 	(short)0;
 	pac.dst = 	(short)0;
+	/* ... */
 	pac.seq = 	(int)0;
 	pac.ack = 	(int)0;
-	/* ... */
 	pac.checksum = 	(short)0;
 	pac.len = 	(char)0;
 	while ( file_offset < FILESIZE )
 	{
+		pac.seq = file_offset / 40; 
 		bytes_read = pread(sendfile_fd, &pac.data, 40, file_offset);
 		ck = 0;
-		for (int i = 0; i < bytes_read; i++)
-			ck += (short)*(&pac.data + i);
+		printf("Calculating checksum... ");
+		for (int i = 0; i < bytes_read; i++) ck += (short)*(&pac.data + i);
 		pac.checksum = ck;
+		printf("done (%d).\n", (int)ck);
 		pac.len = bytes_read;
+
 		/* the while block below continues to send the same Byte until "write_port()"
 		 * returns 1; -1 indicates an error (e.g. resource busy, no data written) 
 		 * while 0 indicates no Bytes were written.
 		 * TODO figure out why so many "resource busy" errors
 		 */
+		printf("Sending packet...\n");
 		for (int i = 0; i < 55; i++)
 		{
-			while ( bytes_written_temp != 1 )
-			{
-				// TODO change &buf to appropriate variable
-				bytes_written_temp = write_port(port_fd, (&pac + i), 1);
-			}
 			bytes_written_temp = 0;
+			while ( bytes_written_temp != 1 )
+				bytes_written_temp = write_port(port_fd, ((char*)&pac + i), 1);
 		}
-		
+		printf("Packet sent. File offset %d B\n", file_offset);		
 		file_offset += bytes_read;
 	}
 	

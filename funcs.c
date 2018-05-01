@@ -48,7 +48,8 @@ open_port(void)
 {
 	int fd; // File descriptor for port
 
-	fd = open(PORT, O_RDWR | O_NOCTTY | O_NDELAY);
+	//fd = open(PORT, O_RDWR | O_NOCTTY | O_NDELAY);
+	fd = open(PORT, O_RDWR | O_NOCTTY );
 	/* O_RDWR	read/write mode
 	 * O_NOCTTY	tells UNIX that this program doesn't want to be the 
 	 * 		'controlling terminal' for this port. Otherwise, 
@@ -61,13 +62,13 @@ open_port(void)
 	if (fd == -1)
 	{
 		// Couldn't open port
-		perror("open_port: Unable to open PORT - ");
+		perror("open_port(): Unable to open PORT - ");
 	}
 	else 
 	{
 		/* set third argument to 0 for blocking read() calls,
 		 * or set to "FNDELAY" for nonblocking */
-		fcntl(fd, F_SETFL, FNDELAY);
+		fcntl(fd, F_SETFL, 0);
 		
 		struct termios options;
 		/* Get current port configuration */
@@ -117,7 +118,7 @@ open_port(void)
 		/* Types of input setup
 		 * Canonical	input is line-oriented; characters are put in a buffer and only sent when
 		 * 				CR or NL is received
-		 * Raw			input is unprocessed. Whatever goes in, goes out.
+		 * Raw		input is unprocessed. Whatever goes in, goes out.
 		 */
 		//options.c_lflag |= (ICANON | ECHO | ECHOE); 		// canonical
 		options.c_lflag &= !(ICANON | ECHO | ECHOE | ISIG);	// raw
@@ -166,7 +167,7 @@ write_port(int fd, const void *buf, size_t count)
 		/* TODO find a better way to handle write_port errors.
 		 * getting a lot of "resource busy" errors etc.
 		 */
-		//perror("write_port: Write to port failed -");
+		perror("write_port(): Unable to write to PORT -");
 	}
 
 	return (n);
