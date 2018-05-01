@@ -7,7 +7,7 @@
 /* This is version 3--incorporates sequence numbers and checksums into packets for Forward Error Correction */
 
 /* func.c Prototypes */
-int open_port(void);
+int open_port(void* buf);
 int write_port(int fd, const void *buf, size_t count);
 int close_port(int fd);
 
@@ -31,9 +31,14 @@ struct Packet
  * must be manually changed to use a different device. it would be useful to
  * specify the port &/or transmission Baud rate as command line args.
  */
+
+/* Compiling
+ * 	gcc funcs.c serial_serial_3.c -o Send
+ * Usage
+ * 	$ ./Send <file> <port> */
 int main(int argc, char* argv[])
 {
-	int port_fd = open_port();
+	int port_fd = open_port(argv[2]);
 	/* Do stuff */
 
 	/* pointer to file we want to send over port */

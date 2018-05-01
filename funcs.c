@@ -13,12 +13,6 @@
  * Fri 27 Apr 20:53:06 EDT 2018
  */
 
-/* ttyAMA0 should be the port for the onboard 
- * but maybe not.
- */
-//#define PORT 	"/dev/ttyAMA0"	
-//#define PORT	"/dev/ttyUSB0"
-
 /* Common baud rates
  * 	  B9600
  * 	 B19200
@@ -46,12 +40,12 @@
  * 	(int) file descriptor of port
  */
 int
-open_port(void* buf)
+open_port(void* port_name)
 {
 	int fd; // File descriptor for port
 
 	//fd = open(PORT, O_RDWR | O_NOCTTY | O_NDELAY);
-	fd = open(buf, O_RDWR | O_NOCTTY );
+	fd = open(port_name, O_RDWR | O_NOCTTY );
 	/* O_RDWR	read/write mode
 	 * O_NOCTTY	tells UNIX that this program doesn't want to be the 
 	 * 		'controlling terminal' for this port. Otherwise, 
@@ -160,7 +154,7 @@ open_port(void* buf)
  * 	(int)		number of Bytes read from port
  */
 int 
-read_port(int fd, const void *buf, size_t count)
+read_port(int fd, void *buf, size_t count)
 {
 	int n = read(fd, buf, count);
 
@@ -175,7 +169,7 @@ read_port(int fd, const void *buf, size_t count)
  * 	(int) number of bytes written, or -1 if error occurred 
  */
 int
-write_port(int fd, const void *buf, size_t count)
+write_port(int fd, void *buf, size_t count)
 {
 	int n = write(fd, buf, count);
 	if (n < 0) 
