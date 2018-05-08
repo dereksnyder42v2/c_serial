@@ -4,13 +4,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-/* func.c Prototypes */
-int open_port(const void* port_name);
-int write_port(int fd, const void *buf, size_t count);
-int read_port(int fd, const void *buf, size_t count);
-int close_port(int fd);
+#include "lib_ser.h"
 
-/* Other Prototypes */
 struct Packet 
 { 
 	short	src;		/* 2  source identifier */
@@ -41,7 +36,8 @@ void print_packet(struct Packet pac)
 	return;
 }
 
-int main(int argc, char* argv[])
+int 
+main(int argc, char* argv[])
 {
 	int port_fd = open_port(argv[2]);
 	if (port_fd == -1) printf("open_port() returned %d\n", port_fd);

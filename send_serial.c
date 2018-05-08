@@ -4,14 +4,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-/* This is version 3--incorporates sequence numbers and checksums into packets for Forward Error Correction */
+#include "lib_ser.h"
 
-/* func.c Prototypes */
-int open_port(void* port_name);
-int write_port(int fd, const void *buf, size_t count);
-int close_port(int fd);
-
-/* Other Prototypes */
 /* TCP style. Total length is  */
 struct Packet 
 { 
@@ -44,9 +38,9 @@ void print_packet(struct Packet pac)
 
 
 /* Compiling
- * 	gcc funcs.c serial_serial_3.c -o Send
+ * 		cc funcs.c serial_serial_3.c -o Send
  * Usage
- * 	$ ./Send <file> <port> */
+ * 		$ ./Send <file> <port>  */
 int main(int argc, char* argv[])
 {
 	int port_fd = open_port(argv[2]);

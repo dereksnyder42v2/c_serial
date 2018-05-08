@@ -35,17 +35,14 @@
 
 
 /* Params
- * 	(str) name of serial port, in /dev/
+ * 		(str) name of serial port, in /dev/
  * Returns
- * 	(int) file descriptor of port
+ * 		(int) file descriptor of port
  */
 int
 open_port(void* port_name)
 {
 	int fd; // File descriptor for port
-
-	//fd = open(PORT, O_RDWR | O_NOCTTY | O_NDELAY);
-	fd = open(port_name, O_RDWR | O_NOCTTY );
 	/* O_RDWR	read/write mode
 	 * O_NOCTTY	tells UNIX that this program doesn't want to be the 
 	 * 		'controlling terminal' for this port. Otherwise, 
@@ -55,6 +52,8 @@ open_port(void* port_name)
 	 * 		<--> in other words, what state the other end of 
 	 * 		the port is in
 	 */
+	//fd = open(PORT, O_RDWR | O_NOCTTY | O_NDELAY);
+	fd = open(port_name, O_RDWR | O_NOCTTY );
 	if (fd == -1)
 	{
 		// Couldn't open port
@@ -111,7 +110,7 @@ open_port(void* port_name)
 			options.c_cflag |= CS8;
 		}
 
-		/* Types of input setup
+		/* Types of input setup:
 		 * Canonical	input is line-oriented; characters are put in a buffer and only sent when
 		 * 				CR or NL is received
 		 * Raw		input is unprocessed. Whatever goes in, goes out.
@@ -137,8 +136,8 @@ open_port(void* port_name)
 		/* Now set new options. 
 		 * TCSANOW 	means do it now, instead of waiting for input
 		 * 		output operations to finish 
-		 * TCSADRAIN 	wait until IO operations finish
-		 * TCSAFLUSH 	flush IO buffers and make changes 
+		 * TCSADRAIN wait until IO operations finish
+		 * TCSAFLUSH flush IO buffers and make changes 
 		 */
 		tcsetattr(fd, TCSAFLUSH, &options);
 	}
@@ -147,18 +146,16 @@ open_port(void* port_name)
 }
 
 /* Params
- * 	(int)	fd	file descriptor of port
- * 		*buf	buffer base pointer to write to 
- * 	size_t	count	max number of Bytes to write into buffer
+ * 		(int)	fd	file descriptor of port
+ * 		(*void)	buffer base pointer to write to 
+ * 		(size_t)count	max number of Bytes to write into buffer
  * Returns
- * 	(int)		number of Bytes read from port
+ * 		(int)	number of Bytes read from port
  */
 int 
-read_port(int fd, void *buf, size_t count)
+read_port(int fd, void* buf, size_t count)
 {
-	int n = read(fd, buf, count);
-
-	return n;
+	return (read(fd, buf, count));
 }
 
 /* Params
@@ -166,10 +163,10 @@ read_port(int fd, void *buf, size_t count)
  *  	(ptr) 	buf		pointer to what to write
  *  	(size_t)count	max number of bytes to write
  * Returns
- * 	(int) number of bytes written, or -1 if error occurred 
+ * 		(int) 	number of bytes written, or -1 if error occurred 
  */
 int
-write_port(int fd, void *buf, size_t count)
+write_port(int fd, void* buf, size_t count)
 {
 	int n = write(fd, buf, count);
 	if (n < 0) 
@@ -185,15 +182,13 @@ write_port(int fd, void *buf, size_t count)
 }
 
 /* Params
- * 	(int)	fd	file descriptor of port
+ * 		(int)	fd	file descriptor of port
  * Returns
- * 	(int)	"0" on success, "-1" on failure
+ * 		(int)	"0" on success, "-1" on failure
  */
 int
 close_port(int fd)
 {
-	int n = close(fd);
-
-	return (n);
+	return (close(fd));
 }
 
