@@ -73,6 +73,9 @@ open_port(void* port_name)
 		cfsetispeed(&options, BAUDRT);
 		cfsetospeed(&options, BAUDRT);		
 
+		/* Raw output */
+		options.c_oflag &= ~OPOST;
+
 		/* Set control options with c_cflag member.
 		 * These should be set as so pretty much always...
 		 * 	CLOCAL	local line; don't change port owner
