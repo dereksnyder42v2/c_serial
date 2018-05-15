@@ -7,10 +7,10 @@ if __name__ == "__main__":
     header_buff = []
     keywords = []
     
-    print("Write all potential headers, pressing RETURN after each. Press ^C to finish. (Exclude stdio.h)")
+    print("Write all potential headers, pressing RETURN after each. Press ^C to finish.\n(Exclude stdio.h)")
     while 1:
         try:
-            header_buff.append(input("> ") )
+            header_buff.append(input("% ") )
         except KeyboardInterrupt:
             break
     outfile.write("#include <stdio.h>\n")
@@ -20,18 +20,16 @@ if __name__ == "__main__":
 """
 int main(void)
 {
-
 """)
-    print("\nWrite all keywords of interest, pressing RETURN after each. Press ^C to finish.")
+    print("\nWrite all keywords to check, pressing RETURN after each. Press ^C to finish.")
     while 1:
         try:
-            keywords.append(input("> ") )
+            keywords.append(input("% ") )
         except KeyboardInterrupt:
             break
     for keyword in keywords:
         outfile.write(
-"""
-#ifdef %s
+"""#ifdef %s
     printf("%s found.\\n");
 #endif
 """ % (keyword, keyword)
@@ -43,7 +41,10 @@ int main(void)
 }
 """)
     outfile.close()
+
+    print()
     os.system("cat headcheck_test.c")
+    
     """
     looksgood = input("OK? [y/n]")
     if looksgood != "y":
@@ -51,7 +52,6 @@ int main(void)
     else:
         pass
     """
-
     print()
     os.system("gcc headcheck_test.c -o Headcheck_test && ./Headcheck_test")
     print()
