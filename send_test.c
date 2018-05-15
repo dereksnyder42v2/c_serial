@@ -11,15 +11,12 @@ main(int argc, char* argv[])
 	/* open port */
 	int port = open_port("/dev/ttyS0");  
 
-	/* send chars, 0->255 */
-	char *str = (char *)malloc(14 * sizeof(char));
-	for (int j = 33; j <= 126; j++)
+	/* send chars, 0->127 */
+	for (char j = 0; j <= 127; j++)
 	{
-		sprintf(str, "Sending %03d %c\n", j, j);
-		//str = "Sending 000 00"
-		printf("%s", str);
 		getchar();
-		write_port(port, str, 14);
+		printf("Sending %03d (%c)\n", (int)j, j);
+		write_port(port, &j, 1);
 	}
 
 	/* close port */

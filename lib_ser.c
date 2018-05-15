@@ -34,6 +34,7 @@
 #define PARITY 	_8N1
 
 
+const long vdisable = _POSIX_VDISABLE;
 /* Params
  * 		(str) name of serial port, in /dev/
  * Returns
@@ -121,6 +122,23 @@ open_port(void* port_name)
 		//options.c_lflag |= (ICANON | ECHO | ECHOE); 		// canonical
 		options.c_lflag &= !(ICANON | ECHO | ECHOE | ISIG);	// raw
 
+		/* Disabling special characters, preserving actual bytes in TX/RX
+		 * TODO 
+		options.c_cc[VDISCARD] 	= vdisable;
+		options.c_cc[VDSUSP] 	= vdisable;
+		options.c_cc[VEOF]		= vdisable;
+		options.c_cc[VEOL]		= vdisable;
+		options.c_cc[VEOL2]		= vdisable;
+		options.c_cc[VERASE]	= vdisable;
+		//options.c_cc[VERASE2] = vdisable; // BSD only
+		options.c_cc[VINTR] 	= vdisable;
+		options.c_cc[VKILL] 	= vdisable;
+		//options.c_cc[VINTR] 	= vdisable;
+		//options.c_cc[VINTR] 	= vdisable;
+		//options.c_cc[VINTR] 	= vdisable;
+		//options.c_cc[VINTR] 	= vdisable;
+		*/
+
 		// TODO
 		/* Input parity checking
 		 *
@@ -158,7 +176,10 @@ open_port(void* port_name)
 int 
 read_port(int fd, void* buf, size_t count)
 {
-	return (read(fd, buf, count));
+	int bytes_read = read(fd, buf, count);
+	if (bytes_read < 0)
+		perror("Error: in read_port(): -");
+	return bytes_read;
 }
 
 /* Params

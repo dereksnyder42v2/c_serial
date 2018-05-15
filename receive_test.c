@@ -7,25 +7,41 @@
 
 #include "lib_ser.h"
 
+/* TODO
+ * look into hardware flow control so that chars
+ * "13d" Carriage Return (converted into "10d" Newline)
+ * "17d", Device control 1 
+ * & "19d" Device control 3
+ * aren't gobbled up by terminal...
+ */
 int
 main(int argc, char* argv[])
 {
 	/* open port */
 	int port = open_port("/dev/ttyUSB0");  
 
-	/* send chars, 0->255 */
-	char *line = (char *)malloc(13 * sizeof(char));
 	int bytes_read = 0;
-	int bytes_waiting = 0;
+	int bytes_waiting_new = 0;
+	int bytes_waiting_old = 0;
+	char buf;
+	//int buf_convert;
+	//tcflush(port, TCIFLUSH);
 	while (1)
 	{
-		ioctl(port, FIONREAD, &bytes_waiting);
-		//printf("%d\n", ioctl(port, FIONREAD, &bytes_waiting));
-		if (bytes_waiting != 0) 
+		/* Store # Bytes in serial buffer in bytes_waiting_new 
+		while (bytes_waiting_new == 0)
 		{
-			printf("%d ", bytes_waiting);
-			//tcflush(port, TCIFLUSH);
+			ioctl(port, FIONREAD, &bytes_waiting_new);
 		}
+		printf("%d B waiting. (Press RETURN)\n");
+		
+		getchar();
+		*/
+		bytes_read = read_port(port, &buf, 1);
+		if (bytes_read > 0)
+			printf("	read %d B\t\t%d\n", bytes_read, (int)buf);
+		//bytes_waiting_new -= bytes_read;
+		//printf("%d B waiting...\n", bytes_waiting_new);
 	}
 
 	/* close port */
